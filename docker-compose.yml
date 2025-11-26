@@ -1,0 +1,70 @@
+services:
+  hapi-r4-postgresql:
+    image: docker.io/hapiproject/hapi:v8.4.0-3
+    environment:
+      - SPRING_AI_MCP_SERVER_STREAMABLEHTTP_MCPENDPOINT=/mcp/messages
+      - SPRING_AI_MCP_SERVER_INSTRUCTIONS=This server provides access to a FHIR
+        RESTful API. You can use it to query FHIR resources, perform operations,
+        and retrieve data in a structured format.
+      - SPRING_AI_MCP_SERVER_VERSION=1.0.0
+      - SPRING_AI_MCP_SERVER_NAME=FHIR MCP Server
+      - SPRING_AI_MCP_SERVER_ENABLED=true
+      - spring.main.allow-bean-definition-overriding=true
+      - hapi.fhir.cdshooks.enabled=true
+      - hapi.fhir.cr.enabled=true
+      - spring.datasource.url=jdbc:postgresql://postgresql-server:5432/postgres
+      - spring.datasource.password=password
+      - hapi.fhir.fhir_version=R4
+      - hapi.fhir.allow_cascading_deletes=true
+      - spring.datasource.driverClassName=org.postgresql.Driver
+      - spring.jpa.properties.hibernate.dialect=ca.uhn.fhir.jpa.model.dialect.HapiFhirPostgres94Dialect
+      - hapi.fhir.allow_external_references=true
+      - spring.datasource.username=postgres
+      - hapi.fhir.allow_multiple_delete=true
+      - hapi.fhir.bulk_export_enabled=true
+      - hapi.fhir.bulk_import_enabled=true
+      - hapi.fhir.expunge_enabled=true
+    ports:
+      - 8080:8080
+    volumes: []
+    deploy:
+      replicas: 1
+      resources:
+        limits: {}
+        reservations:
+          memory: 1500M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    configs: []
+    networks:
+      - hapi-fhir_network
+  postgresql-server:
+    image: docker.io/postgres:18
+    environment:
+      - POSTGRES_PASSWORD=password
+    ports:
+      - 5432:5432
+    volumes: []
+    deploy:
+      replicas: 1
+      resources:
+        limits: {}
+        reservations:
+          memory: 32M
+      restart_policy:
+        condition: on-failure
+        delay: 10s
+        max_attempts: 3
+        window: 120s
+    configs: []
+    networks:
+      - hapi-fhir_network
+networks:
+  hapi-fhir_network:
+    name: hapi-fhir_network
+volumes: {}
+configs: {}
+
