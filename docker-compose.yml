@@ -76,7 +76,6 @@ services:
       - open-webui:/app/backend/data
     networks:
       - hapi-fhir_network
-    
   searxng:
     container_name: searxng
     image: searxng/searxng:latest
@@ -96,6 +95,28 @@ services:
       options:
         max-size: "1m"
         max-file: "1"
+    networks:
+      - hapi-fhir_network
+  crawl4ai:
+    image: unclecode/crawl4ai:0.7
+    environment:
+      - LLM_PROVIDER=openai/qwen3:4b
+      - LLM_BASE_URL=http://host.docker.internal:11434/v1
+      - OPENAI_API_KEY=ollama
+      - LLM_TEMPERATURE=0.7
+    ports:
+      - 11235:11235
+    volumes:
+      - /dev/shm:/dev/shm  # Chromium performance
+    networks:
+      - hapi-fhir_network
+  mcpo:
+    image: ghcr.io/open-webui/mcpo:main
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./mcpo_config.json:/app/config/config.json:ro
+    command: mcpo --config /app/config/config.json --hot-reload
     networks:
       - hapi-fhir_network
 

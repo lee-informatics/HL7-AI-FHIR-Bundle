@@ -1,0 +1,8 @@
+{
+  "mcpServers": {
+    "crawl4ai": {
+      "type": "sse",
+      "url": "http://host.docker.internal:11235/mcp/sse"
+    }
+  }
+}
