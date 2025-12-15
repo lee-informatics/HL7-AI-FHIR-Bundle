@@ -77,14 +77,13 @@ services:
     networks:
       - hapi-fhir_network
   searxng:
-    container_name: searxng
     image: searxng/searxng:latest
     environment:
       - SEARXNG_HOSTNAME=localhost:8080/
     ports:
       - "8080:8080"
     volumes:
-      - ./searxng:/etc/searxng:rw
+      - ./searXNG_settings.yml:/etc/searxng/settings.yml:rw
     cap_add:
       - CHOWN
       - SETGID
@@ -125,6 +124,5 @@ networks:
     name: hapi-fhir_network
 volumes:
   open-webui:
-  ollama_data:
 configs: {}
 
