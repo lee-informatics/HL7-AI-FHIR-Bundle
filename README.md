@@ -18,8 +18,14 @@ This docker-compose setup provides:
 
 - Docker and Docker Compose installed
 - **Ollama running locally on port 11434** - You must have Ollama installed and running before starting this stack
-  - Install Ollama from [ollama.ai](https://ollama.ai)
-  - Pull a model (e.g., `ollama pull llama3.2` or `ollama pull qwen3:4b` or other)
+  - **Installation options:**
+    - Download and install from [ollama.ai](https://ollama.ai), OR
+    - If you are on macOS with Homebrew installed: ```brew install ollama```
+  - **Start Ollama:**
+    - If installed via ollama.ai: Follow their instructions to start the service
+    - If installed via Homebrew on macOS: The service starts automatically, or run ```ollama serve```
+  - **Pull a model:**
+    - Run ```ollama pull qwen3:4b``` or any other model of your choice
 
 ## Required Configuration Files
 
