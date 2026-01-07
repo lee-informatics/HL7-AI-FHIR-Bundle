@@ -1,1 +1,0 @@
-[{"type":"mcp","url":"http://host.docker.internal:8081/mcp/messages","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","info":{"id":"hapi-fhir","name":"HAPI FHIR MCP","description":""}}]

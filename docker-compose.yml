@@ -63,15 +63,20 @@ services:
   open-webui:
     image: ghcr.io/open-webui/open-webui:main
     environment:
-      OLLAMA_BASE_URL: "http://host.docker.internal:11434"
-      WEBUI_AUTH: "False"
+      CUSTOM_NAME: "HL7 AI FHIR Bundle"
+      WEBUI_NAME: "HL7 AI FHIR Bundle"
+      WEBUI_AUTH: False
+      OLLAMA_BASE_URL: ${LLM_BASE_URL}
+      ENABLE_WEB_SEARCH: True
+      WEB_SEARCH_ENGINE: "searxng"
       ENABLE_RAG_WEB_SEARCH: True
       RAG_WEB_SEARCH_ENGINE: "searxng"
       RAG_WEB_SEARCH_RESULT_COUNT: 3
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
       SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
+      TOOL_SERVER_CONNECTIONS: '[{"type":"openapi","url":"http://host.docker.internal:8000/crawl4ai","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config": { "enable": true },"info":{"id":"c4ai","name":"crawl4ai","description":"Crawl or scrape a list of URLs"}},{"type":"mcp","url":"http://host.docker.internal:8081/mcp/messages","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","info":{"id":"hapi-fhir","name":"HAPI FHIR MCP","description":""}}]'
     ports:
-      - "3080:8080"
+      - "3000:8080"
     volumes:
       - open-webui:/app/backend/data
     networks:
@@ -79,7 +84,7 @@ services:
   searxng:
     image: searxng/searxng:latest
     environment:
-      - SEARXNG_HOSTNAME=localhost:8080/
+      - SEARXNG_HOSTNAME=searxng:8080/
     ports:
       - "8080:8080"
     volumes:
@@ -98,15 +103,15 @@ services:
       - hapi-fhir_network
   crawl4ai:
     image: unclecode/crawl4ai:0.7
+    shm_size: "1gb"
+    init: true
     environment:
-      - LLM_PROVIDER=openai/qwen3:4b
-      - LLM_BASE_URL=http://host.docker.internal:11434/v1
+      - LLM_PROVIDER=openai/qwen3-coder:30b #recommended for best performance
+      - LLM_BASE_URL=${LLM_BASE_URL}
       - OPENAI_API_KEY=ollama
       - LLM_TEMPERATURE=0.7
     ports:
       - 11235:11235
-    volumes:
-      - /dev/shm:/dev/shm  # Chromium performance
     networks:
       - hapi-fhir_network
   mcpo:
