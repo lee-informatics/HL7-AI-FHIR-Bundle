@@ -31,8 +31,8 @@ This docker-compose setup provides:
 
 The following configuration files must be present in the project directory:
 
-1. **`settings.yml`** - SearXNG search engine configuration
-2. **`mcpo_config.json`** - MCP server orchestrator configuration for connecting to Crawl4AI and other MCP servers
+1. [searXNG_settings.yml](searXNG_settings.yml) - SearXNG search engine configuration
+2. [mcpo_config.json](mcpo_config.json) - MCP server orchestrator configuration for connecting to Crawl4AI and other MCP servers
 
 ## Starting the Services
 
