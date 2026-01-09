@@ -89,22 +89,10 @@ services:
       - "8080:8080"
     volumes:
       - ./searXNG_settings.yml:/etc/searxng/settings.yml:rw
-    cap_add:
-      - CHOWN
-      - SETGID
-      - SETUID
-      - DAC_OVERRIDE
-    logging:
-      driver: "json-file"
-      options:
-        max-size: "1m"
-        max-file: "1"
     networks:
       - hapi-fhir_network
   crawl4ai:
     image: unclecode/crawl4ai:0.7
-    shm_size: "1gb"
-    init: true
     environment:
       - LLM_PROVIDER=openai/qwen3-coder:30b #recommended for best performance
       - LLM_BASE_URL=${LLM_BASE_URL}
