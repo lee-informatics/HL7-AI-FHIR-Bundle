@@ -3,6 +3,10 @@
     "crawl4ai": {
       "type": "sse",
       "url": "http://host.docker.internal:11235/mcp/sse"
+    },
+    "hapi-fhir": {
+      "type": "streamable-http",
+      "url": "http://host.docker.internal:8081/mcp/messages"
     }
   }
 }

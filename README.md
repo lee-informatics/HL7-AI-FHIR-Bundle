@@ -69,3 +69,23 @@ Once running, you can access:
 ## Using Open WebUI
 
 Vist http://localhost:3000 and you are ready to go. Just remember to toggle on websearch and any mcp tools needed for each chat.
+
+### Recommended
+- In Open WebUI:
+  1. Click "User" (bottom-left) → "Admin Panel" → "Settings" → "Models".
+  2. Select the model you're using and add [model_prompt.txt](model_prompt.txt).
+
+- If tools are not working great, add the following under "External tools":
+
+  - HAPI-FHIR  
+    - Function Name Filter List (comma-separated):
+    ```text
+    tool_create_fhir_resource_post, tool_read_fhir_resource_post, tool_update_fhir_resource_post, tool_delete_fhir_resource_post, tool_search_fhir_resources_post
+    ```
+
+  - Crawl4AI  
+    - Function Name Filter List:
+    ```text
+    tool_crawl_post
+    ```
+
