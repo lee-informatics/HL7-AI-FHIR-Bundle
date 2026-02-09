@@ -7,6 +7,10 @@
     "hapi-fhir": {
       "type": "streamable-http",
       "url": "http://host.docker.internal:8081/mcp/messages"
+    },
+    "terminology-server": {
+      "type": "streamable-http",
+      "url": "http://host.docker.internal:8001/mcp"
     }
   }
 }

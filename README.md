@@ -1,91 +1,89 @@
+
 # AI-FHIR-Bundle
 
-A complete local AI setup with FHIR (Fast Healthcare Interoperability Resources) integration, web search capabilities, and MCP (Model Context Protocol) server support. This project enables you to run a fully functional local AI environment with healthcare data interoperability, leveraging LLM agents with access to FHIR resources and web search tools.
+A local, docker-compose based stack that integrates a FHIR server, LLM tooling, web search, and MCP (Model Context Protocol) orchestration—designed for building and testing AI agents that interact with FHIR resources and external web content.
 
-## What's Included
+## Features
 
-This docker-compose setup provides:
-
-- **HAPI FHIR Server (R4)** - A complete FHIR server with MCP integration for healthcare data operations
-- **PostgreSQL** - Database backend for HAPI FHIR
-- **Open WebUI** - Modern chat interface for interacting with local LLMs
-- **Ollama Integration** - Connects to your locally running Ollama instance for LLM inference
-- **SearXNG** - Privacy-focused metasearch engine for web search capabilities
-- **Crawl4AI** - Advanced web crawling and extraction service with LLM processing
-- **MCPO** - MCP Orchestrator/Proxy for managing MCP server connections
+- HAPI FHIR Server (R4) with MCP integration
+- PostgreSQL database for persistence
+- Open WebUI — chat interface for interacting with local LLMs
+- Ollama integration for local LLM inference
+- SearXNG — privacy-focused metasearch engine
+- Crawl4AI — web crawling and content ingestion service
+- fhir-mcp-server - access to HL7 Terminolgy server
+- MCPO — MCP Orchestrator/Proxy to manage MCP connections
 
 ## Prerequisites
 
-- Docker and Docker Compose installed
-- **Ollama running locally on port 11434** - You must have Ollama installed and running before starting this stack
-  - **Installation options:**
-    - Download and install from [ollama.ai](https://docs.ollama.com/quickstart), OR
-    - If you are on macOS with Homebrew installed: ```brew install ollama```
-  - **Start Ollama:**
-    - If installed via ollama.ai: Follow their instructions to start the service
-    - If installed via Homebrew on macOS: The service starts automatically, or run ```ollama serve```
-  - **Pull a model:**
-    - Run ```ollama pull qwen3:14b``` or any other model of your choice
+- Docker and Docker Compose
+- Ollama (if you want local LLM inference)
+  - Install: see https://docs.ollama.com/quickstart or, on macOS with Homebrew, `brew install ollama`
+  - Start: follow Ollama docs or run `ollama serve` if needed
+  - Pull a model (example):
 
-## Required Configuration Files
+To have the best experience you need a GPU with enough RAM to completely load your model of choice. Our tests and default configuration use the qwen3-coder-next model that uses 52GB of GPU RAM!
+```bash
+ollama pull qwen3-coder-next:latest
+```
 
-The following configuration files must be present in the project directory:
+## Configuration files
 
-1. [searXNG_settings.yml](searXNG_settings.yml) - SearXNG search engine configuration
-2. [mcpo_config.json](mcpo_config.json) - MCP server orchestrator configuration for connecting to Crawl4AI and other MCP servers
+Place the following files in the project root (examples may be included in the repo):
 
-## Starting the Services
+- `searXNG_settings.yml` — SearXNG configuration
+- `mcpo_config.json` — MCP orchestrator configuration for connecting to Crawl4AI and other MCP servers
 
-### Initial Setup
+## Quick start
 
-1. **Configure environment variables:**
-  - Copy `.env.example` to `.env`
-  - If Ollama is running on a remote server, update the `OLLAMA_BASE_URL` in `.env` with your server URL
+1. Copy the environment file and edit values if needed:
 
-### Start Services
+```bash
+cp .env.example .env
+# Edit .env if Ollama or other services run on non-default hosts/ports
+```
 
-To start all services with the latest images and clean up any orphaned containers:
+2. Start the full stack (pulls latest images and removes orphaned containers):
 
 ```bash
 docker compose up --pull always --remove-orphans
 ```
 
-This command will:
-- Pull the latest versions of all container images
-- Remove any orphaned containers from previous runs
-- Start all services defined in the docker-compose.yml
+This will pull the required images, remove orphaned containers, and start all services defined in `docker-compose.yml`.
 
-## Access Points
+## Service endpoints
 
-Once running, you can access:
-
-- **Open WebUI**: http://localhost:3000 - Main AI chat interface
-- **HAPI FHIR Server**: http://localhost:8081 - FHIR RESTful API
-- **SearXNG**: http://localhost:8080 - Search engine interface
-- **Crawl4AI**: http://localhost:11235 - Web crawling service
-- **MCPO**: http://localhost:8000 - MCP Orchestrator
-- **PostgreSQL**: localhost:5432 - Database (credentials: postgres/password)
+- Open WebUI: http://localhost:3000
+- SearXNG: http://localhost:8080
+- HAPI FHIR Server (R4): http://localhost:8081
+- Crawl4AI: http://localhost:11235
+- fhir-mcp-server: http://localhost:8001
+- MCPO: http://localhost:8000
+- PostgreSQL: localhost:5432 (default: `postgres` / `password`)
 
 ## Using Open WebUI
 
-Vist http://localhost:3000 and you are ready to go. Just remember to toggle on websearch and any mcp tools needed for each chat.
+1. Open http://localhost:3000
+2. In the UI: User → Admin Panel → Settings → Models
+   - Select the model you pulled in Ollama and add `model_prompt.txt` as the model prompt
+3. Under Tools, enable the integrations: `crawl4ai`, `HAPI FHIR`, `terminology-server`
+4. Save and update settings
 
-### Recommended
-- In Open WebUI:
-  1. Click "User" (bottom-left) → "Admin Panel" → "Settings" → "Models".
-  2. Select the model you're using and add [model_prompt.txt](model_prompt.txt).
+Notes:
+- Only enable Web Search when you need live web queries — it triggers searches for every requests and can slow interactions.
+- Use Crawl4AI when you need deep search as scraping and ingestion takes a long time.
 
-- If tools are not working great, add the following under "External tools":
+## Tips & Troubleshooting
 
-  - HAPI-FHIR  
-    - Function Name Filter List (comma-separated):
-    ```text
-    tool_create_fhir_resource_post, tool_read_fhir_resource_post, tool_update_fhir_resource_post, tool_delete_fhir_resource_post, tool_search_fhir_resources_post
-    ```
+- Prevent the LLM from accidentally trying to change the terminology server as you probably not intending to and the provided server is read only anyways: in Open WebUI go to User → Admin Panel → Settings → External tools → terminology-server and add the following to the Function Name Filter List (comma-separated):
 
-  - Crawl4AI  
-    - Function Name Filter List:
-    ```text
-    tool_crawl_post
-    ```
+```text
+!tool_create_post, !tool_update_post, !tool_delete_post
+```
+
+- If crawls fail frequently, add `tool_crawl_post` to the Function Name Filter List.
+
+## License
+
+See the `LICENSE` file for license details.
 
