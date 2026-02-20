@@ -297,21 +297,7 @@ engines:
     engine: apple_app_store
     shortcut: aps
     disabled: true
-
-  - name: anaconda
-    engine: xpath
-    paging: true
-    first_page_num: 0
-    search_url: https://anaconda.org/search?q={query}&page={pageno}
-    results_xpath: //tbody/tr
-    url_xpath: ./td/h5/a[last()]/@href
-    title_xpath: ./td/h5
-    content_xpath: ./td[h5]/text()
-    categories: it
-    timeout: 6.0
-    shortcut: conda
-    disabled: true
-
+    
   - name: artic
     engine: artic
     shortcut: arc
@@ -520,20 +506,9 @@ engines:
   #   disabled: true
   #   timeout: 5
 
-  - name: 1x
-    engine: www1x
-    shortcut: 1x
-    timeout: 3.0
-    disabled: true
-
   - name: fdroid
     engine: fdroid
     shortcut: fd
-    disabled: true
-
-  - name: findthatmeme
-    engine: findthatmeme
-    shortcut: ftm
     disabled: true
 
   - name: free software directory
@@ -691,12 +666,6 @@ engines:
     sort_criteria: "recent_downloads"
     page_size: 10
 
-  - name: crates.io
-    engine: crates
-    shortcut: crates
-    disabled: true
-    timeout: 6.0
-
   - name: hoogle
     engine: xpath
     search_url: https://hoogle.haskell.org/?hoogle={query}
@@ -787,12 +756,6 @@ engines:
     categories: images
     disabled: true
 
-  - name: lingva
-    engine: lingva
-    shortcut: lv
-    # set lingva instance in url, by default it will use the official instance
-    # url: https://lingva.thedaviddelta.com
-
   - name: lobste.rs
     engine: xpath
     search_url: https://lobste.rs/search?q={query}&what=stories&order=relevance
@@ -843,12 +806,6 @@ engines:
       require_api_key: false
       results: JSON
 
-  - name: metacpan
-    engine: metacpan
-    shortcut: cpan
-    disabled: true
-    number_of_results: 20
-
   - name: microsoft learn
     engine: microsoft_learn
     shortcut: msl
@@ -867,12 +824,6 @@ engines:
     # mozhi_engine: google - see https://mozhi.aryak.me for supported engines
     timeout: 4.0
     shortcut: mz
-    disabled: true
-
-  - name: npm
-    engine: npm
-    shortcut: npm
-    timeout: 5.0
     disabled: true
 
   - name: mankier
@@ -1206,27 +1157,6 @@ engines:
     api_site: 'superuser'
     categories: [it, q&a]
 
-  - name: discuss.python
-    engine: discourse
-    shortcut: dpy
-    base_url: 'https://discuss.python.org'
-    categories: [it, q&a]
-    disabled: true
-
-  - name: caddy.community
-    engine: discourse
-    shortcut: caddy
-    base_url: 'https://caddy.community'
-    categories: [it, q&a]
-    disabled: true
-
-  - name: pi-hole.community
-    engine: discourse
-    shortcut: pi
-    categories: [it, q&a]
-    base_url: 'https://discourse.pi-hole.net'
-    disabled: true
-
   # - name: searx
   #   engine: searx_engine
   #   shortcut: se
@@ -1463,32 +1393,6 @@ engines:
     paging: false
     disabled: true
 
-  - name: moviepilot
-    engine: moviepilot
-    shortcut: mp
-    disabled: true
-
-  - name: rubygems
-    shortcut: rbg
-    engine: xpath
-    paging: true
-    search_url: https://rubygems.org/search?page={pageno}&query={query}
-    results_xpath: /html/body/main/div/a[@class="gems__gem"]
-    url_xpath: ./@href
-    title_xpath: ./span/h2
-    content_xpath: ./span/p
-    suggestion_xpath: /html/body/main/div/div[@class="search__suggestions"]/p/a
-    first_page_num: 1
-    categories: [it, packages]
-    disabled: true
-    about:
-      website: https://rubygems.org/
-      wikidata_id: Q1853420
-      official_api_documentation: https://guides.rubygems.org/rubygems-org-api/
-      use_official_api: false
-      require_api_key: false
-      results: HTML
-
   - name: peertube
     engine: peertube
     shortcut: ptb
@@ -1557,15 +1461,6 @@ engines:
     engine: tootfinder
     shortcut: toot
 
-  - name: uxwing
-    engine: uxwing
-    shortcut: ux
-
-  - name: voidlinux
-    engine: voidlinux
-    shortcut: void
-    disabled: true
-
   - name: wttr.in
     engine: wttr
     shortcut: wttr
@@ -1611,23 +1506,12 @@ engines:
   #   brave_category: goggles
   #   Goggles: # required! This should be a URL ending in .goggle
 
-  - name: lib.rs
-    shortcut: lrs
-    engine: lib_rs
-    disabled: true
-
   - name: sourcehut
     shortcut: srht
     engine: sourcehut
     # https://docs.searxng.org/dev/engines/online/sourcehut.html
     # sourcehut_sort_order: longest-active
     disabled: true
-
-  - name: pkg.go.dev
-    engine: pkg_go_dev
-    shortcut: pgo
-    disabled: true
-
 
 # Be careful when enabling this engine if you are
 # running a public instance. Do not expose any sensitive
