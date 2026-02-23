@@ -84,12 +84,11 @@ services:
       - hapi-fhir_network
   searxng:
     image: searxng/searxng:latest
-    environment:
-      - SEARXNG_HOSTNAME=searxng:8080/
     ports:
       - "8080:8080"
     volumes:
       - ./searXNG_settings.yml:/etc/searxng/settings.yml:rw
+      - ./limiter.toml:/etc/searxng/limiter.toml:rw
     networks:
       - hapi-fhir_network
   crawl4ai:

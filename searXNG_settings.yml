@@ -405,6 +405,7 @@ engines:
     disabled: true
     shortcut: aa
     timeout: 5
+    inactive: true
 
   - name: ansa
     engine: ansa
@@ -436,6 +437,8 @@ engines:
     categories: onions
     enable_http: true
     shortcut: ah
+    inactive: true
+
 
   - name: anaconda
     engine: xpath
@@ -2063,6 +2066,7 @@ engines:
     categories: onions
     enable_http: true
     shortcut: tch
+    inactive: true
 
   # TubeArchivist is a self-hosted Youtube archivist software.
   # https://docs.searxng.org/dev/engines/online/tubearchivist.html
@@ -2533,6 +2537,7 @@ engines:
     categories: news
     seekr_category: news
     disabled: true
+    inactive: true
 
   - name: seekr images
     engine: seekr
@@ -2541,6 +2546,7 @@ engines:
     categories: images
     seekr_category: images
     disabled: true
+    inactive: true
 
   - name: seekr videos
     engine: seekr
@@ -2549,6 +2555,7 @@ engines:
     categories: videos
     seekr_category: videos
     disabled: true
+    inactive: true
 
   - name: stract
     engine: stract
