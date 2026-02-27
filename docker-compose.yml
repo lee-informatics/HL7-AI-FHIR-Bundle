@@ -61,7 +61,7 @@ services:
     networks:
       - hapi-fhir_network
   open-webui:
-    image: ghcr.io/open-webui/open-webui:main
+    image: ghcr.io/open-webui/open-webui:v0.8.3
     environment:
       CUSTOM_NAME: "HL7 AI FHIR Bundle"
       WEBUI_NAME: "HL7 AI FHIR Bundle"
