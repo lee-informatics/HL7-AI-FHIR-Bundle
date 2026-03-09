@@ -1,6 +1,6 @@
 services:
   hapi-r4-postgresql:
-    image: docker.io/hapiproject/hapi:v8.4.0-3
+    image: docker.io/hapiproject/hapi:v8.8.0-1
     environment:
       - SPRING_AI_MCP_SERVER_STREAMABLEHTTP_MCPENDPOINT=/mcp/messages
       - SPRING_AI_MCP_SERVER_INSTRUCTIONS=This server provides access to a FHIR RESTful API. 
@@ -61,7 +61,7 @@ services:
     networks:
       - hapi-fhir_network
   open-webui:
-    image: ghcr.io/open-webui/open-webui:v0.8.3
+    image: ghcr.io/open-webui/open-webui:main
     environment:
       CUSTOM_NAME: "HL7 AI FHIR Bundle"
       WEBUI_NAME: "HL7 AI FHIR Bundle"
@@ -74,8 +74,8 @@ services:
       RAG_WEB_SEARCH_RESULT_COUNT: 3
       RAG_WEB_SEARCH_CONCURRENT_REQUESTS: 10
       SEARXNG_QUERY_URL: "http://searxng:8080/search?q=<query>"
-      TOOL_SERVER_CONNECTIONS: '[{"type":"openapi","url":"http://host.docker.internal:8000/crawl4ai","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"c4ai","name":"crawl4ai","description":"Web crawling tool."}},{"type":"openapi","url":"http://host.docker.internal:8000/hapi-fhir","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"hapi-fhir","name":"HAPI FHIR","description":"FHIR server admin API."}},{"type":"openapi","url":"http://host.docker.internal:8000/terminology-server","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"terminology-server","name":"terminology-server","description":"Terminology FHIR Server."}}]'
-      DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE: 'Available Tools: {{TOOLS}} Return ONLY a valid JSON object of the form {"tool_calls":[]} OR {"tool_calls":[{"name":"...","parameters":{...}}, ...]}; no prose and no extra keys. ROUTER INVARIANTS: (1) If the user request requires any FHIR server interaction, you MUST return tool_calls using MCP FHIR tools (never explain). (2) Never claim inability to access FHIR servers; tool access is assumed available. (3) Never invent IDs, identifiers, codes, server names, or resource content; use only user-provided values. (4) If any required parameter is missing or ambiguous and cannot be safely inferred, return {"tool_calls":[]}. TWO-SERVER ROUTING: A) HAPI clinical server (mutations + clinical CRUD/search): use Create-Fhir-Resource, Read-Fhir-Resource, Update-Fhir-Resource, Delete-Fhir-Resource, Search-Fhir-Resources, Patch-Fhir-Resource, Conditional-Patch-Fhir-Resource, Conditional-Update-Fhir-Resource, Create-Fhir-Transaction, Call-Cds-Hook for Patient/Encounter/Observation/etc or any create/update/patch/delete/transaction. B) Terminology server (read/search only): use get_capabilities, search, read, get_user only for terminology lookups/search; DO NOT use terminology create/update/delete even if present. WRITE VERIFICATION (HAPI ONLY): if any HAPI write tool is included (Create/Update/Patch/Delete/Conditional*/Transaction), append an immediate verification call (prefer Read-Fhir-Resource if an id will be known, else Search-Fhir-Resources). If no tools match, return {"tool_calls":[]}.'
+      TOOL_SERVER_CONNECTIONS: '[{"type":"openapi","url":"http://host.docker.internal:8000/crawl4ai","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"c4ai","name":"Deep Research","description":"Web scraping tool."}},{"type":"openapi","url":"http://host.docker.internal:8000/hapi-fhir","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"hapi-fhir","name":"HAPI FHIR Server","description":"HAPI FHIR Server API."}},{"type":"openapi","url":"http://host.docker.internal:8000/terminology-server","spec_type":"url","spec":"","path":"openapi.json","auth_type":"none","key":"","config":{"enable":true},"info":{"id":"terminology-server","name":"Terminology Server","description":"Terminology FHIR Server."}}]'
+      DEFAULT_TOOLS_FUNCTION_CALLING_PROMPT_TEMPLATE: 'Available Tools: {{TOOLS}} IDENTITY: You are a deterministic FHIR tool router. You select tools and parameters. You do not explain, narrate, or converse. OUTPUT CONTRACT: Return ONLY one valid JSON object. No prose, no markdown, no extra keys. With calls: {"tool_calls":[{"name":"...","parameters":{...}}, ...]} Without calls: {"tool_calls":[]} SCOPE: This prompt is responsible ONLY for selecting the correct tool(s) and populating parameters from user input. It is NOT responsible for: explaining FHIR concepts, answering questions without tools, interpreting clinical meaning, validating FHIR correctness, or formatting human-readable output. SERVER CLASSIFICATION (apply in order, stop at first match): TERMINOLOGY SERVER — MATCH WHEN the request is EXCLUSIVELY about: looking up codes, code systems, value sets, concept maps, naming systems; searching or reading terminology resources (CodeSystem, ValueSet, ConceptMap, NamingSystem); validating codes or translating between code systems; checking server terminology capabilities. Tools ALLOWED: get_capabilities, search, read, get_user. Tools FORBIDDEN: Any create, update, patch, delete, transaction tool even if present in terminology namespace. HAPI FHIR SERVER — MATCH WHEN the request involves ANY of: clinical resources (Patient, Encounter, Observation, Condition, Procedure, MedicationRequest, AllergyIntolerance, DiagnosticReport, Immunization, CarePlan, or ANY non-terminology FHIR resource); any mutation (create, update, patch, delete, transaction regardless of resource type); CDS Hooks invocation; searching or reading clinical/administrative resources. Tools ALLOWED: ALL. DISAMBIGUATION RULE: If a request mentions BOTH clinical data AND terminology concepts (e.g. find all Observations using LOINC code X), route to HAPI FHIR for the data operation. The terminology code is a parameter value, not a terminology server operation. DECISION HIERARCHY (resolve conflicts in this order): 1. Never fabricate IDs, identifiers, codes, resource content, server names — use ONLY values present in user input. 2. Server classification accuracy > parameter completeness > call count minimization. 3. If a required parameter is missing AND cannot be unambiguously derived from user input, return {"tool_calls":[]}. 4. If the request is ambiguous between servers, prefer HAPI FHIR when any clinical resource is referenced. WRITE VERIFICATION: After any HAPI mutation tool (Create/Update/Patch/Delete/Conditional-Patch/Conditional-Update/Create-Fhir-Transaction), append a verification call: if resource id is known or will be returned use Read-Fhir-Resource, otherwise use Search-Fhir-Resources with identifying parameters from the write. FAILURE BEHAVIOR: Request outside FHIR domain returns {"tool_calls":[]}. Missing required parameter with no safe inference returns {"tool_calls":[]}. Cannot determine correct server returns {"tool_calls":[]}. Never claim inability to access servers — tool access is always available. Never explain why you returned empty — just return empty. PROHIBITED: No natural language in output. No invented parameter values. No terminology server tools for clinical resource operations. No HAPI FHIR tools for pure terminology lookups. No tool calls when zero tools match the request.'
     ports:
       - "3000:8080"
     volumes:
@@ -118,7 +118,12 @@ services:
     command: mcpo --config /app/config/config.json --hot-reload
     networks:
       - hapi-fhir_network
-
+  fhir-controller:
+    image: docker.io/p3000/fhir-controller:latest
+    ports:
+      - 4204:80
+    networks:
+      - hapi-fhir_network
 networks:
   hapi-fhir_network:
     name: hapi-fhir_network
