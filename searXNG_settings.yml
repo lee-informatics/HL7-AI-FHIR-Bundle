@@ -84,7 +84,7 @@ server:
   bind_address: "127.0.0.1"
   # public URL of the instance, to ensure correct inbound links. Is overwritten
   # by ${SEARXNG_BASE_URL}.
-  base_url: false  # "http://example.com/location"
+  base_url: http://searxng:8080
   # rate limit the number of request on the instance, block some bots.
   # Is overwritten by ${SEARXNG_LIMITER}
   limiter: false
@@ -2506,6 +2506,7 @@ engines:
     categories: videos
     disabled: true
     timeout: 5.0
+    inactive: true
 
   - name: wordnik
     engine: wordnik
@@ -2561,6 +2562,7 @@ engines:
     engine: stract
     shortcut: str
     disabled: true
+    inactive: true
 
   - name: svgrepo
     engine: svgrepo
